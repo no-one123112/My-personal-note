@@ -2,73 +2,185 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>My Cozy Notes</title>
+<title>Daily Notes & Tasks</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
+:root{
+  --bg: linear-gradient(135deg,#ffecd2,#fcb69f);
+}
 body{
   margin:0;
-  font-family:'Quicksand',sans-serif;
-  background:linear-gradient(180deg,#fef6e4,#e8f0ff);
+  font-family:'Baloo 2',cursive;
+  background:var(--bg);
   min-height:100vh;
 }
 header{
-  padding:25px;
   text-align:center;
+  padding:20px;
 }
-header h1{
-  margin:0;
-  font-size:26px;
-}
-header p{
-  margin-top:5px;
-  color:#555;
-}
+header h1{margin:0;font-size:26px}
+header p{margin:5px;color:#444}
+
 .container{
-  padding:15px;
-  max-width:600px;
+  max-width:650px;
   margin:auto;
+  padding:15px;
 }
-.editor{
+
+.switcher{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:15px;
+}
+.switcher button{
+  border:none;
+  padding:8px 14px;
+  border-radius:12px;
+  background:white;
+}
+
+.card{
   background:white;
   border-radius:20px;
   padding:15px;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
   margin-bottom:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,.1);
 }
-.editor textarea{
+
+textarea,input{
   width:100%;
-  height:120px;
   border:none;
-  resize:none;
-  font-size:16px;
   outline:none;
-  font-family:'Quicksand',sans-serif;
+  font-family:'Baloo 2';
+  font-size:16px;
 }
-.editor button{
-  margin-top:10px;
+
+button.main{
   width:100%;
   padding:10px;
   border:none;
-  border-radius:12px;
-  background:#6c63ff;
+  border-radius:14px;
+  background:#ff7a7a;
   color:white;
   font-size:16px;
+  margin-top:10px;
 }
+
 .note{
-  background:white;
-  border-radius:18px;
-  padding:15px;
-  margin-bottom:15px;
-  box-shadow:0 8px 20px rgba(0,0,0,.07);
-  position:relative;
+  background:#fff4d9;
+  padding:12px;
+  border-radius:14px;
+  margin-bottom:10px;
 }
-.note:nth-child(odd){
-  background:#fff7e6;
+
+.todo{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
 }
-.note:nth-child(even){
+.todo span.done{
+  text-decoration:line-through;
+  color:#888;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🌈 Daily Notes</h1>
+  <p>Write • Plan • Smile ✨</p>
+</header>
+
+<div class="switcher">
+  <button onclick="setBg(1)">🌸</button>
+  <button onclick="setBg(2)">🌈</button>
+  <button onclick="setBg(3)">🌊</button>
+</div>
+
+<div class="container">
+
+<!-- NOTES -->
+<div class="card">
+  <h3>📝 Notes</h3>
+  <textarea id="noteText" placeholder="Write your note... 💕"></textarea>
+  <button class="main" onclick="addNote()">Save Note</button>
+  <div id="notes"></div>
+</div>
+
+<!-- TODO -->
+<div class="card">
+  <h3>✅ To-Do List</h3>
+  <input id="taskText" placeholder="Add a task 🌟">
+  <button class="main" onclick="addTask()">Add Task</button>
+  <div id="tasks"></div>
+</div>
+
+</div>
+
+<script>
+let notes = JSON.parse(localStorage.getItem("notes"))||[];
+let tasks = JSON.parse(localStorage.getItem("tasks"))||[];
+
+function save(){
+  localStorage.setItem("notes",JSON.stringify(notes));
+  localStorage.setItem("tasks",JSON.stringify(tasks));
+}
+
+function addNote(){
+  let t=document.getElementById("noteText").value.trim();
+  if(!t)return;
+  notes.unshift(t);
+  document.getElementById("noteText").value="";
+  save();render();
+}
+
+function addTask(){
+  let t=document.getElementById("taskText").value.trim();
+  if(!t)return;
+  tasks.push({text:t,done:false});
+  document.getElementById("taskText").value="";
+  save();render();
+}
+
+function toggleTask(i){
+  tasks[i].done=!tasks[i].done;
+  save();render();
+}
+
+function render(){
+  document.getElementById("notes").innerHTML=
+    notes.map(n=>`<div class="note">${n}</div>`).join("");
+
+  document.getElementById("tasks").innerHTML=
+    tasks.map((t,i)=>`
+      <div class="todo">
+        <input type="checkbox" ${t.done?"checked":""} onclick="toggleTask(${i})">
+        <span class="${t.done?"done":""}">${t.text}</span>
+      </div>`).join("");
+}
+
+function setBg(n){
+  const bgs=[
+    "linear-gradient(135deg,#ffecd2,#fcb69f)",
+    "linear-gradient(135deg,#cfd9df,#e2ebf0)",
+    "linear-gradient(135deg,#a1c4fd,#c2e9fb)"
+  ];
+  document.documentElement.style.setProperty("--bg",bgs[n-1]);
+  localStorage.setItem("bg",n);
+}
+
+if(localStorage.getItem("bg")) setBg(localStorage.getItem("bg"));
+render();
+</script>
+
+</body>
+</html>
   background:#eaf2ff;
 }
 .note small{
