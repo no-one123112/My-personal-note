@@ -12,50 +12,78 @@ body{
   margin:0;
   font-family:'Baloo 2',cursive;
   min-height:100vh;
+  transition:.3s;
 }
 
-/* ====== GENDER SCREENS ====== */
+/* ===== SELECT GENDER ===== */
 .select{
   display:flex;
   flex-direction:column;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
   height:100vh;
-  gap:20px;
   background:linear-gradient(135deg,#ffd6e8,#e0f0ff);
+  gap:20px;
 }
 .select button{
-  padding:15px 30px;
+  padding:15px 35px;
   font-size:20px;
   border:none;
-  border-radius:20px;
+  border-radius:25px;
   background:white;
 }
 
-/* ====== APP ====== */
-.app{
-  display:none;
-  min-height:100vh;
-  padding:20px;
-}
+/* ===== APP ===== */
+.app{display:none;padding:15px}
 
-.header{
-  text-align:center;
-}
-.header h1{margin-bottom:5px}
-
-/* BACKGROUNDS */
-.girl{
+/* ===== BACKGROUNDS ===== */
+/* GIRLS */
+.girl.bg1{
   background:
-    radial-gradient(circle at 10% 20%, #ffd1dc 10%, transparent 11%),
-    radial-gradient(circle at 80% 30%, #ffe4f2 10%, transparent 11%),
+    radial-gradient(circle,#ffb6c1 15%,transparent 16%) 0 0/80px 80px,
     linear-gradient(#ffe6f0,#fff);
 }
-.boy{
+.girl.bg2{
   background:
-    radial-gradient(circle at 15% 25%, #cce5ff 10%, transparent 11%),
-    radial-gradient(circle at 75% 40%, #d6f5ff 10%, transparent 11%),
-    linear-gradient(#e8f4ff,#fff);
+    radial-gradient(circle,#e0bbff 15%,transparent 16%) 40px 40px/80px 80px,
+    linear-gradient(#f5e6ff,#fff);
+}
+.girl.bg3{
+  background:
+    radial-gradient(circle,#ffd966 15%,transparent 16%) 20px 20px/80px 80px,
+    linear-gradient(#fff2cc,#fff);
+}
+
+/* BOYS */
+.boy.bg1{
+  background:
+    radial-gradient(circle,#b3d9ff 15%,transparent 16%) 0 0/80px 80px,
+    linear-gradient(#e6f2ff,#fff);
+}
+.boy.bg2{
+  background:
+    radial-gradient(circle,#b3ffd9 15%,transparent 16%) 40px 40px/80px 80px,
+    linear-gradient(#e6fff2,#fff);
+}
+.boy.bg3{
+  background:
+    radial-gradient(circle,#d6ccff 15%,transparent 16%) 20px 20px/80px 80px,
+    linear-gradient(#f0e6ff,#fff);
+}
+
+/* ===== UI ===== */
+.header{text-align:center}
+.switcher{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin:10px 0;
+}
+.switcher button{
+  padding:8px 12px;
+  border:none;
+  border-radius:12px;
+  background:white;
 }
 
 .card{
@@ -71,8 +99,8 @@ textarea,input{
   width:100%;
   border:none;
   outline:none;
-  font-size:16px;
   font-family:'Baloo 2';
+  font-size:16px;
 }
 
 button.main{
@@ -83,25 +111,10 @@ button.main{
   border-radius:14px;
   background:#ff7a7a;
   color:white;
-  font-size:16px;
 }
-
-.note{
-  background:#fff4d9;
-  padding:12px;
-  border-radius:14px;
-  margin-top:10px;
-}
-
-.todo{
-  display:flex;
-  gap:8px;
-  margin-top:8px;
-}
-.todo.done span{
-  text-decoration:line-through;
-  color:#888;
-}
+.note{background:#fff4d9;padding:10px;border-radius:12px;margin-top:8px}
+.todo{display:flex;gap:8px;margin-top:6px}
+.todo.done span{text-decoration:line-through;color:#888}
 </style>
 </head>
 
@@ -109,65 +122,73 @@ button.main{
 
 <!-- SELECT -->
 <div class="select" id="select">
-  <h2>Who are you? 🌈</h2>
-  <button onclick="setGender('girl')">👧 Girl</button>
-  <button onclick="setGender('boy')">👦 Boy</button>
+  <h2>Choose 🌈</h2>
+  <button onclick="setUser('girl')">👧 Girl</button>
+  <button onclick="setUser('boy')">👦 Boy</button>
 </div>
 
 <!-- APP -->
 <div class="app" id="app">
   <div class="header">
     <h1>📔 My Cozy Notes</h1>
-    <p>Write & plan happily ✨</p>
+    <p>Choose your favorite background ✨</p>
+  </div>
+
+  <!-- BACKGROUND SWITCH -->
+  <div class="switcher">
+    <button onclick="setBg(1)">🎨 1</button>
+    <button onclick="setBg(2)">🌈 2</button>
+    <button onclick="setBg(3)">✨ 3</button>
   </div>
 
   <div class="card">
     <h3>📝 Notes</h3>
-    <textarea id="noteText" placeholder="Write your note..."></textarea>
-    <button class="main" onclick="addNote()">Save Note</button>
+    <textarea id="noteText"></textarea>
+    <button class="main" onclick="addNote()">Save</button>
     <div id="notes"></div>
   </div>
 
   <div class="card">
     <h3>✅ To-Do</h3>
-    <input id="taskText" placeholder="Add task">
+    <input id="taskText">
     <button class="main" onclick="addTask()">Add</button>
     <div id="tasks"></div>
   </div>
 </div>
 
 <script>
-let notes = JSON.parse(localStorage.getItem("notes"))||[];
-let tasks = JSON.parse(localStorage.getItem("tasks"))||[];
+let notes=JSON.parse(localStorage.getItem("notes"))||[];
+let tasks=JSON.parse(localStorage.getItem("tasks"))||[];
 
-function setGender(g){
-  localStorage.setItem("gender",g);
+function setUser(g){
+  localStorage.setItem("user",g);
+  localStorage.setItem("bg",1);
   start();
 }
-
-function start(){
-  let g = localStorage.getItem("gender");
-  if(!g) return;
-  document.getElementById("select").style.display="none";
-  document.getElementById("app").style.display="block";
-  document.body.className=g;
+function setBg(n){
+  localStorage.setItem("bg",n);
+  start();
 }
-
+function start(){
+  let u=localStorage.getItem("user");
+  if(!u)return;
+  select.style.display="none";
+  app.style.display="block";
+  document.body.className=`${u} bg${localStorage.getItem("bg")}`;
+}
 function addNote(){
-  let t=noteText.value.trim();
-  if(!t)return;
-  notes.unshift(t);
+  if(!noteText.value)return;
+  notes.unshift(noteText.value);
   noteText.value="";
   save();render();
 }
 function addTask(){
-  let t=taskText.value.trim();
-  if(!t)return;
-  tasks.push({text:t,done:false});
+  if(!taskText.value)return;
+  tasks.push({text:taskText.value,done:false});
   taskText.value="";
   save();render();
 }
-function toggleTask(i){
+function toggle(i){
   tasks[i].done=!tasks[i].done;
   save();render();
 }
@@ -176,15 +197,13 @@ function save(){
   localStorage.setItem("tasks",JSON.stringify(tasks));
 }
 function render(){
-  notesBox.innerHTML=notes.map(n=>`<div class="note">${n}</div>`).join("");
-  tasksBox.innerHTML=tasks.map((t,i)=>`
+  notes.innerHTML=notes.map(n=>`<div class="note">${n}</div>`).join("");
+  tasks.innerHTML=tasks.map((t,i)=>`
     <div class="todo ${t.done?'done':''}">
-      <input type="checkbox" ${t.done?'checked':''} onclick="toggleTask(${i})">
+      <input type="checkbox" onclick="toggle(${i})" ${t.done?'checked':''}>
       <span>${t.text}</span>
     </div>`).join("");
 }
-const notesBox=document.getElementById("notes");
-const tasksBox=document.getElementById("tasks");
 start();render();
 </script>
 
