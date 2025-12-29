@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Personal Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #e4efe9);
+      min-height: 100vh;
+    }
+
+    header {
+      background: #6c63ff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .container {
+      padding: 15px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .quote {
+      background: white;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .add-note {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #6c63ff;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+
+    .note {
+      background: white;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    .note textarea {
+      width: 100%;
+      border: none;
+      resize: none;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .note-footer {
+      text-align: right;
+      font-size: 11px;
+      color: #999;
+    }
+
+    .delete {
+      background: none;
+      border: none;
+      color: #ff4d4d;
+      cursor: pointer;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  My Personal Notes
+</header>
+
+<div class="container">
+
+  <div class="quote">
+    ✨ Write something you don’t want to forget today
+  </div>
+
+  <button class="add-note" onclick="addNote()">➕ Add New Note</button>
+
+  <div id="notes"></div>
+
+</div>
+
+<script>
+  let notes = JSON.parse(localStorage.getItem("notes")) || [];
+
+  function saveNotes() {
+    localStorage.setItem("notes", JSON.stringify(notes));
+  }
+
+  function addNote(text = "") {
+    const note = {
+      content: text,
+      date: new Date().toLocaleDateString()
+    };
+    notes.unshift(note);
+    saveNotes();
+    renderNotes();
+  }
+
+  function deleteNote(index) {
+    notes.splice(index, 1);
+    saveNotes();
+    renderNotes();
+  }
+
+  function renderNotes() {
+    const notesDiv = document.getElementById("notes");
+    notesDiv.innerHTML = "";
+
+    notes.forEach((note, index) => {
+      const noteDiv = document.createElement("div");
+      noteDiv.className = "note";
+
+      noteDiv.innerHTML = `
+        <textarea oninput="updateNote(${index}, this.value)">${note.content}</textarea>
+        <div class="note-footer">
+          ${note.date}
+          <br>
+          <button class="delete" onclick="deleteNote(${index})">Delete</button>
+        </div>
+      `;
+
+      notesDiv.appendChild(noteDiv);
+    });
+  }
+
+  function updateNote(index, value) {
+    notes[index].content = value;
+    saveNotes();
+  }
+
+  renderNotes();
+</script>
+
+</body>
+</html>
