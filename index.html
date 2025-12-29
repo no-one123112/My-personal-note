@@ -2,52 +2,68 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Daily Notes & Tasks</title>
+<title>My Cozy Notes</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --bg: linear-gradient(135deg,#ffecd2,#fcb69f);
-}
 body{
   margin:0;
   font-family:'Baloo 2',cursive;
-  background:var(--bg);
   min-height:100vh;
 }
-header{
-  text-align:center;
+
+/* ====== GENDER SCREENS ====== */
+.select{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  gap:20px;
+  background:linear-gradient(135deg,#ffd6e8,#e0f0ff);
+}
+.select button{
+  padding:15px 30px;
+  font-size:20px;
+  border:none;
+  border-radius:20px;
+  background:white;
+}
+
+/* ====== APP ====== */
+.app{
+  display:none;
+  min-height:100vh;
   padding:20px;
 }
-header h1{margin:0;font-size:26px}
-header p{margin:5px;color:#444}
 
-.container{
-  max-width:650px;
-  margin:auto;
-  padding:15px;
+.header{
+  text-align:center;
 }
+.header h1{margin-bottom:5px}
 
-.switcher{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  margin-bottom:15px;
+/* BACKGROUNDS */
+.girl{
+  background:
+    radial-gradient(circle at 10% 20%, #ffd1dc 10%, transparent 11%),
+    radial-gradient(circle at 80% 30%, #ffe4f2 10%, transparent 11%),
+    linear-gradient(#ffe6f0,#fff);
 }
-.switcher button{
-  border:none;
-  padding:8px 14px;
-  border-radius:12px;
-  background:white;
+.boy{
+  background:
+    radial-gradient(circle at 15% 25%, #cce5ff 10%, transparent 11%),
+    radial-gradient(circle at 75% 40%, #d6f5ff 10%, transparent 11%),
+    linear-gradient(#e8f4ff,#fff);
 }
 
 .card{
   background:white;
   border-radius:20px;
   padding:15px;
-  margin-bottom:20px;
+  margin:15px auto;
+  max-width:600px;
   box-shadow:0 10px 25px rgba(0,0,0,.1);
 }
 
@@ -55,11 +71,12 @@ textarea,input{
   width:100%;
   border:none;
   outline:none;
-  font-family:'Baloo 2';
   font-size:16px;
+  font-family:'Baloo 2';
 }
 
 button.main{
+  margin-top:10px;
   width:100%;
   padding:10px;
   border:none;
@@ -67,23 +84,21 @@ button.main{
   background:#ff7a7a;
   color:white;
   font-size:16px;
-  margin-top:10px;
 }
 
 .note{
   background:#fff4d9;
   padding:12px;
   border-radius:14px;
-  margin-bottom:10px;
+  margin-top:10px;
 }
 
 .todo{
   display:flex;
-  align-items:center;
   gap:8px;
-  margin-bottom:8px;
+  margin-top:8px;
 }
-.todo span.done{
+.todo.done span{
   text-decoration:line-through;
   color:#888;
 }
@@ -92,170 +107,85 @@ button.main{
 
 <body>
 
-<header>
-  <h1>🌈 Daily Notes</h1>
-  <p>Write • Plan • Smile ✨</p>
-</header>
-
-<div class="switcher">
-  <button onclick="setBg(1)">🌸</button>
-  <button onclick="setBg(2)">🌈</button>
-  <button onclick="setBg(3)">🌊</button>
+<!-- SELECT -->
+<div class="select" id="select">
+  <h2>Who are you? 🌈</h2>
+  <button onclick="setGender('girl')">👧 Girl</button>
+  <button onclick="setGender('boy')">👦 Boy</button>
 </div>
 
-<div class="container">
+<!-- APP -->
+<div class="app" id="app">
+  <div class="header">
+    <h1>📔 My Cozy Notes</h1>
+    <p>Write & plan happily ✨</p>
+  </div>
 
-<!-- NOTES -->
-<div class="card">
-  <h3>📝 Notes</h3>
-  <textarea id="noteText" placeholder="Write your note... 💕"></textarea>
-  <button class="main" onclick="addNote()">Save Note</button>
-  <div id="notes"></div>
-</div>
+  <div class="card">
+    <h3>📝 Notes</h3>
+    <textarea id="noteText" placeholder="Write your note..."></textarea>
+    <button class="main" onclick="addNote()">Save Note</button>
+    <div id="notes"></div>
+  </div>
 
-<!-- TODO -->
-<div class="card">
-  <h3>✅ To-Do List</h3>
-  <input id="taskText" placeholder="Add a task 🌟">
-  <button class="main" onclick="addTask()">Add Task</button>
-  <div id="tasks"></div>
-</div>
-
+  <div class="card">
+    <h3>✅ To-Do</h3>
+    <input id="taskText" placeholder="Add task">
+    <button class="main" onclick="addTask()">Add</button>
+    <div id="tasks"></div>
+  </div>
 </div>
 
 <script>
 let notes = JSON.parse(localStorage.getItem("notes"))||[];
 let tasks = JSON.parse(localStorage.getItem("tasks"))||[];
 
-function save(){
-  localStorage.setItem("notes",JSON.stringify(notes));
-  localStorage.setItem("tasks",JSON.stringify(tasks));
+function setGender(g){
+  localStorage.setItem("gender",g);
+  start();
+}
+
+function start(){
+  let g = localStorage.getItem("gender");
+  if(!g) return;
+  document.getElementById("select").style.display="none";
+  document.getElementById("app").style.display="block";
+  document.body.className=g;
 }
 
 function addNote(){
-  let t=document.getElementById("noteText").value.trim();
+  let t=noteText.value.trim();
   if(!t)return;
   notes.unshift(t);
-  document.getElementById("noteText").value="";
+  noteText.value="";
   save();render();
 }
-
 function addTask(){
-  let t=document.getElementById("taskText").value.trim();
+  let t=taskText.value.trim();
   if(!t)return;
   tasks.push({text:t,done:false});
-  document.getElementById("taskText").value="";
+  taskText.value="";
   save();render();
 }
-
 function toggleTask(i){
   tasks[i].done=!tasks[i].done;
   save();render();
 }
-
-function render(){
-  document.getElementById("notes").innerHTML=
-    notes.map(n=>`<div class="note">${n}</div>`).join("");
-
-  document.getElementById("tasks").innerHTML=
-    tasks.map((t,i)=>`
-      <div class="todo">
-        <input type="checkbox" ${t.done?"checked":""} onclick="toggleTask(${i})">
-        <span class="${t.done?"done":""}">${t.text}</span>
-      </div>`).join("");
-}
-
-function setBg(n){
-  const bgs=[
-    "linear-gradient(135deg,#ffecd2,#fcb69f)",
-    "linear-gradient(135deg,#cfd9df,#e2ebf0)",
-    "linear-gradient(135deg,#a1c4fd,#c2e9fb)"
-  ];
-  document.documentElement.style.setProperty("--bg",bgs[n-1]);
-  localStorage.setItem("bg",n);
-}
-
-if(localStorage.getItem("bg")) setBg(localStorage.getItem("bg"));
-render();
-</script>
-
-</body>
-</html>
-  background:#eaf2ff;
-}
-.note small{
-  color:#777;
-}
-.delete{
-  position:absolute;
-  top:10px;
-  right:12px;
-  background:none;
-  border:none;
-  font-size:16px;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-  <h1>📔 My Cozy Notes</h1>
-  <p>Write your thoughts freely ✨</p>
-</header>
-
-<div class="container">
-
-  <!-- Writing Area -->
-  <div class="editor">
-    <textarea id="noteText" placeholder="Write your note here... 🌸"></textarea>
-    <button onclick="addNote()">Save Note</button>
-  </div>
-
-  <!-- Notes -->
-  <div id="notes"></div>
-
-</div>
-
-<script>
-let notes = JSON.parse(localStorage.getItem("notes")) || [];
-
 function save(){
   localStorage.setItem("notes",JSON.stringify(notes));
+  localStorage.setItem("tasks",JSON.stringify(tasks));
 }
-
-function addNote(){
-  const text=document.getElementById("noteText").value.trim();
-  if(!text) return;
-  notes.unshift({
-    text:text,
-    date:new Date().toLocaleDateString()
-  });
-  document.getElementById("noteText").value="";
-  save();
-  render();
-}
-
-function del(i){
-  notes.splice(i,1);
-  save();
-  render();
-}
-
 function render(){
-  const box=document.getElementById("notes");
-  box.innerHTML="";
-  notes.forEach((n,i)=>{
-    box.innerHTML+=`
-      <div class="note">
-        <button class="delete" onclick="del(${i})">🗑️</button>
-        <p>${n.text}</p>
-        <small>📅 ${n.date}</small>
-      </div>`;
-  });
+  notesBox.innerHTML=notes.map(n=>`<div class="note">${n}</div>`).join("");
+  tasksBox.innerHTML=tasks.map((t,i)=>`
+    <div class="todo ${t.done?'done':''}">
+      <input type="checkbox" ${t.done?'checked':''} onclick="toggleTask(${i})">
+      <span>${t.text}</span>
+    </div>`).join("");
 }
-
-render();
+const notesBox=document.getElementById("notes");
+const tasksBox=document.getElementById("tasks");
+start();render();
 </script>
 
 </body>
