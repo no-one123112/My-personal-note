@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مفكرتي الكيوت المطورة ✨</title>
+    <title>مفكرتي  الذكية ✨</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
-            --bg-pattern: radial-gradient(#ffb7c5 0.5px, #fff5f8 0.5px);
+            --bg-color: #fff5f8;
             --accent: #ffb7c5;
             --font-color: #5d4037;
         }
 
         body {
-            background-image: var(--bg-pattern);
+            background-color: var(--bg-color);
+            background-image: radial-gradient(var(--accent) 0.5px, transparent 0.5px);
             background-size: 20px 20px;
             color: var(--font-color);
-            font-family: 'Cairo', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -24,43 +26,31 @@
             transition: 0.3s;
         }
 
-        /* لوحة التحكم */
         .toolbar {
             background: white;
             padding: 15px;
-            border-radius: 25px;
+            border-radius: 20px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             margin-bottom: 20px;
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
             justify-content: center;
-            align-items: center;
-            width: 90%;
-            max-width: 700px;
-        }
-
-        .tool-group { display: flex; align-items: center; gap: 8px; }
-
-        /* منطقة النوتة */
-        .notebook-wrapper {
-            position: relative;
-            width: 90%;
-            max-width: 600px;
-            height: 500px;
-        }
-
-        .diary-page {
             width: 100%;
-            height: 100%;
-            background: #fff;
-            border-radius: 10px;
-            border-left: 40px solid var(--accent);
-            box-shadow: 10px 10px 0px rgba(0,0,0,0.05);
-            padding: 20px;
-            box-sizing: border-box;
+            max-width: 650px;
+        }
+
+        .notebook-area {
             position: relative;
-            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+            height: 600px;
+            background: white;
+            border-radius: 15px;
+            border-right: 35px solid var(--accent);
+            box-shadow: 15px 15px 0px rgba(0,0,0,0.05);
+            padding: 20px;
+            overflow: hidden; /* لمنع خروج الملصقات عن الإطار */
         }
 
         textarea {
@@ -69,136 +59,149 @@
             border: none;
             outline: none;
             resize: none;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: var(--font-color);
-            background: repeating-linear-gradient(transparent, transparent 30px, #eee 31px);
+            background: repeating-linear-gradient(transparent, transparent 30px, #f0f0f0 31px);
             line-height: 31px;
-            font-family: inherit;
         }
 
-        /* ملصقات */
-        .stickers-shelf {
-            margin-top: 15px;
-            background: rgba(255,255,255,0.8);
+        .stickers-menu {
+            margin-top: 20px;
+            background: white;
             padding: 10px;
             border-radius: 50px;
             display: flex;
             gap: 15px;
             font-size: 2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .sticker { cursor: grab; transition: 0.2s; user-select: none; }
-        .sticker:active { cursor: grabbing; }
+        .sticker-opt {
+            cursor: pointer;
+            transition: 0.2s;
+        }
 
+        .sticker-opt:hover { transform: scale(1.3); }
+
+        /* الملصق عند ظهوره داخل النوتة */
         .placed-sticker {
             position: absolute;
-            font-size: 2.5rem;
+            font-size: 3rem;
             cursor: move;
+            user-select: none;
             z-index: 10;
         }
 
-        button {
+        .btn {
             background: var(--accent);
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
         }
 
-        input[type="color"] {
-            border: none;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            background: none;
-        }
+        .btn-download { background: #6dd5ed; }
     </style>
 </head>
 <body>
 
     <div class="toolbar">
-        <div class="tool-group">
-            <span>الثيم:</span>
-            <button onclick="updateTheme('#ffb7c5', '#fff5f8')">🌸</button>
-            <button onclick="updateTheme('#90caf9', '#e3f2fd')">☁️</button>
-            <button onclick="updateTheme('#c5e1a5', '#f1f8e9')">🍃</button>
+        <div>
+            <span>لون الخط: </span>
+            <input type="color" id="colorPicker" onchange="changeColor(this.value)">
         </div>
-        
-        <div class="tool-group">
-            <span>لون الخط:</span>
-            <input type="color" id="textColor" value="#5d4037" onchange="updateTextColor(this.value)">
-        </div>
-
-        <button onclick="saveAll()">حفظ الكل 💾</button>
-        <button onclick="reset()" style="background:#ff6b6b">تصفير 🗑️</button>
+        <button class="btn" onclick="changeTheme('#ffb7c5', '#fff5f8')">وردي 🌸</button>
+        <button class="btn" onclick="changeTheme('#90caf9', '#e3f2fd')" style="background:#90caf9">أزرق ☁️</button>
+        <button class="btn" onclick="changeTheme('#ce93d8', '#f3e5f5')" style="background:#ce93d8">بنفسجي 💜</button>
+        <button class="btn btn-download" onclick="downloadDiary()">تحميل كصورة 📸</button>
     </div>
 
-    <div class="notebook-wrapper" id="canvas">
-        <div class="diary-page">
-            <textarea id="mainNote" placeholder="اكتب يومياتك هنا..."></textarea>
-        </div>
+    <div class="notebook-area" id="notebook">
+        <textarea id="text" placeholder="اكتب مشاعرك هنا..."></textarea>
     </div>
 
-    <div class="stickers-shelf">
-        <div class="sticker" draggable="true" ondragstart="drag(event)">🎀</div>
-        <div class="sticker" draggable="true" ondragstart="drag(event)">🐱</div>
-        <div class="sticker" draggable="true" ondragstart="drag(event)">🍓</div>
-        <div class="sticker" draggable="true" ondragstart="drag(event)">🧸</div>
-        <div class="sticker" draggable="true" ondragstart="drag(event)">💖</div>
-        <div class="sticker" draggable="true" ondragstart="drag(event)">🍭</div>
+    <div class="stickers-menu">
+        <span class="sticker-opt" onclick="addSticker('🎀')">🎀</span>
+        <span class="sticker-opt" onclick="addSticker('🐱')">🐱</span>
+        <span class="sticker-opt" onclick="addSticker('🍓')">🍓</span>
+        <span class="sticker-opt" onclick="addSticker('🧸')">🧸</span>
+        <span class="sticker-opt" onclick="addSticker('🌈')">🌈</span>
+        <span class="sticker-opt" onclick="addSticker('🍭')">🍭</span>
     </div>
 
-    <p style="font-size: 0.8rem; margin-top: 10px;">* اسحب الملصقات وضعها فوق النوتة لتزيينها!</p>
+    <p style="margin-top:10px; font-size:0.9rem">اضغط على الملصق لإضافته، واسحبه داخل النوتة لتغيير مكانه!</p>
 
     <script>
         // تغيير الثيم
-        function updateTheme(accent, bg) {
+        function changeTheme(accent, bg) {
             document.documentElement.style.setProperty('--accent', accent);
-            document.documentElement.style.setProperty('--bg-pattern', `radial-gradient(${accent} 0.5px, ${bg} 0.5px)`);
+            document.documentElement.style.setProperty('--bg-color', bg);
         }
 
         // تغيير لون الخط
-        function updateTextColor(color) {
-            document.documentElement.style.setProperty('--font-color', color);
+        function changeColor(color) {
+            document.getElementById('text').style.color = color;
         }
 
-        // نظام السحب والإفلات للملصقات
-        function drag(ev) {
-            ev.dataTransfer.setData("text", ev.target.innerText);
+        // إضافة ملصق
+        function addSticker(emoji) {
+            const sticker = document.createElement('div');
+            sticker.className = 'placed-sticker';
+            sticker.innerText = emoji;
+            
+            // وضع الملصق في مكان عشوائي بسيط داخل النوتة في البداية
+            sticker.style.left = Math.random() * 200 + 50 + 'px';
+            sticker.style.top = Math.random() * 200 + 50 + 'px';
+
+            // جعل الملصق قابلاً للسحب
+            makeDraggable(sticker);
+
+            // حذف الملصق عند الضغط المزدوج
+            sticker.ondblclick = function() { this.remove(); };
+
+            document.getElementById('notebook').appendChild(sticker);
         }
 
-        const canvas = document.getElementById('canvas');
-        canvas.ondragover = (e) => e.preventDefault();
-        
-        canvas.ondrop = (ev) => {
-            ev.preventDefault();
-            const data = ev.dataTransfer.getData("text");
-            const sticker = document.createElement("div");
-            sticker.className = "placed-sticker";
-            sticker.innerText = data;
-            
-            const rect = canvas.getBoundingClientRect();
-            sticker.style.left = (ev.clientX - rect.left - 20) + "px";
-            sticker.style.top = (ev.clientY - rect.top - 20) + "px";
-            
-            // جعل الملصق الموضوع قابل للتحريك أيضاً أو الحذف
-            sticker.onclick = () => sticker.remove();
-            
-            canvas.appendChild(sticker);
-        };
+        // دالة السحب والإفلات (المحسنة)
+        function makeDraggable(el) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            el.onmousedown = dragMouseDown;
 
-        function saveAll() {
-            alert("تم حفظ إبداعاتك يا بطل! ✨");
-            // هنا يمكن إضافة كود حفظ الـ HTML كاملاً في localStorage
-        }
-
-        function reset() {
-            if(confirm("هل تريد مسح الصفحة والملصقات؟")) {
-                document.getElementById('mainNote').value = "";
-                document.querySelectorAll('.placed-sticker').forEach(s => s.remove());
+            function dragMouseDown(e) {
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
             }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                el.style.top = (el.offsetTop - pos2) + "px";
+                el.style.left = (el.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        // تحميل النوتة كصورة
+        function downloadDiary() {
+            const notebook = document.getElementById('notebook');
+            html2canvas(notebook).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'my-cute-diary.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
         }
     </script>
 </body>
